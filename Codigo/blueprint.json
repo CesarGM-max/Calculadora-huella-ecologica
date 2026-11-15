@@ -1,0 +1,96 @@
+{
+  "name": "Huella_Ecologica_Equipo",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": 3064341,
+        "maxResults": 1
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "ai-local-agent:RunLocalAIAgent",
+      "version": 0,
+      "parameters": {
+        "makeConnectionId": 10771262
+      },
+      "tools": [],
+      "mapper": {
+        "message": "Carne: {{1.carne}}\nComida local: {{1.local}}\nTransporte: {{1.transporte}}\nKm al dia: {{1.km}}\nVuelos al ano: {{1.vuelos}}\nAire acondicionado (h/dia): {{1.aire}}\nPersonas en casa: {{1.personas}}\nRopa nueva al mes: {{1.ropa}}\nCambio de celular (cada cuantos anos): {{1.celular}}\nSepara basura: {{1.separa}}",
+        "threadId": "",
+        "outputType": "text",
+        "tokenLimit": "50",
+        "modelConfig": {
+          "timeout": "",
+          "recursionLimit": "300",
+          "aiCompactionEnabled": true,
+          "iterationsFromHistoryCount": "10"
+        },
+        "defaultModel": "large",
+        "systemPrompt": "Eres un analista de huella ecologica para alumnos de Desarrollo Sustentable del TecNM en Mazatlan, Sinaloa (clima calido, uso alto de aire acondicionado).\nRecibiras las respuestas de un cuestionario de estilo de vida. Estima la huella ecologica de la persona.\nAclara que es una estimacion aproximada y no un calculo oficial.\n\nReferencias para que tu estimacion sea coherente:\n- Una persona tiene hoy en promedio 2.5 hectareas globales (gha) de huella en el mundo y 2.65 gha en Mexico. Los estilos de vida muy austeros rondan 1.5 gha y los de alto consumo (auto, carne diaria, vuelos) pueden pasar de 6 gha.\n- La Tierra ofrece unas 1.6 gha de biocapacidad por persona.\n- Calcula los planetas asi: planetas = hectareas globales por ano / 1.6. Verifica que ambas cifras sean consistentes entre si.\n- El aire acondicionado se reparte entre las personas que viven en la casa.\n\nResponde en texto plano (sin asteriscos, sin markdown), en espanol, con este formato. Reemplaza cada [corchete] con contenido real; nunca copies el texto de las instrucciones:\n\nTU HUELLA ESTIMADA\nHectareas globales por ano: [numero con un decimal]\nPlanetas necesarios si todos vivieran asi: [numero con un decimal]\n\nPOR AREA (de mayor a menor impacto)\nAlimentacion: [ALTO, MEDIO o BAJO] - [razon concreta basada en las respuestas, en 1 linea]\nTransporte: [ALTO, MEDIO o BAJO] - [razon concreta, en 1 linea]\nEnergia: [ALTO, MEDIO o BAJO] - [razon concreta, en 1 linea]\nConsumo: [ALTO, MEDIO o BAJO] - [razon concreta, en 1 linea]\nResiduos: [ALTO, MEDIO o BAJO] - [razon concreta, en 1 linea]\n\n3 ACCIONES PARA REDUCIRLA\n1. [la de mayor efecto]\n2. [accion concreta]\n3. [accion concreta]\n\nOPORTUNIDAD ECONOMICA\n[2 lineas: un negocio o servicio sustentable de la region que ayudaria a reducir esta huella]",
+        "promptCaching": "none",
+        "fallbackEnabled": false
+      },
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "gateway:WebhookRespond",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "body": "{{2.response}}",
+        "status": "200",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 600,
+          "y": 0
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "designer": {
+      "orphans": []
+    },
+    "scenario": {
+      "dlq": false,
+      "dataloss": false,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "roundtrips": 1,
+      "sequential": false,
+      "confidential": false,
+      "freshVariables": false,
+      "autoCommitTriggerLast": true
+    }
+  }
+}

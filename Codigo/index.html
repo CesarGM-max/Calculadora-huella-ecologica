@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de huella ecológica</title>
+<style>
+  :root { --verde:#2e7d32; --verde-osc:#1b5e20; --crema:#f1f8e9; --tierra:#5d4037; --azul:#00796b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: linear-gradient(180deg,#e0f2f1,#f1f8e9); color:#263238; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 16px; }
+  header { text-align:center; padding: 18px 8px 8px; }
+  h1 { margin:0 0 6px; color: var(--verde-osc); font-size: 1.7rem; }
+  header p { margin:0; color: var(--tierra); }
+  form, .resultado-box { background:#fff; border-radius:14px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.08); margin-top:14px; }
+  fieldset { border:1px solid #c5e1a5; border-radius:10px; margin:0 0 14px; padding:10px 12px 4px; }
+  legend { font-weight:700; color: var(--azul); padding:0 6px; }
+  .campo { margin-bottom:12px; }
+  .campo label { display:block; font-weight:600; color: var(--verde-osc); margin-bottom:4px; }
+  .campo small { color:#607d8b; font-weight:400; }
+  select, input[type=number] { width:100%; padding:10px; font-size:1rem; border:1px solid #b0bec5; border-radius:8px; background:#fff; }
+  select:focus, input[type=number]:focus { outline:2px solid var(--verde); border-color:var(--verde); }
+  button { width:100%; margin-top:6px; padding:13px; border:0; border-radius:10px; font-size:1.05rem; font-weight:600; cursor:pointer; color:#fff; background: var(--verde); }
+  button:disabled { opacity:.6; cursor:not-allowed; }
+  #estado { margin-top:10px; font-weight:600; min-height:1.2em; }
+  .error { color:#c62828; }
+  #resultado { white-space: pre-line; background: var(--crema); border:1px solid #c5e1a5; border-radius:10px; padding:12px; margin-top:8px; }
+  footer { text-align:center; font-size:.8rem; color:#607d8b; padding:14px 0 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Calculadora de huella ecológica</h1>
+    <p>Si todos vivieran como tú, ¿cuántos planetas Tierra harían falta?</p>
+  </header>
+
+  <form id="formHuella" novalidate>
+    <fieldset>
+      <legend>Alimentación</legend>
+      <div class="campo"><label for="carne">¿Cada cuánto comes carne de res o cerdo?</label>
+        <select id="carne" name="carne">
+          <option>Nunca</option>
+          <option>1-2 veces por semana</option>
+          <option selected>3-5 veces por semana</option>
+          <option>Diario</option>
+        </select></div>
+      <div class="campo"><label for="local">¿Qué parte de tu comida es local o de temporada?</label>
+        <select id="local" name="local">
+          <option>Casi nada</option>
+          <option selected>La mitad</option>
+          <option>Casi todo</option>
+        </select></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Transporte</legend>
+      <div class="campo"><label for="transporte">Medio principal</label>
+        <select id="transporte" name="transporte">
+          <option>Caminar o bicicleta</option>
+          <option>Camión urbano</option>
+          <option>Moto</option>
+          <option selected>Auto propio</option>
+        </select></div>
+      <div class="campo"><label for="km">Kilómetros que recorres al día <small>(número)</small></label>
+        <input type="number" id="km" name="km" min="0" step="any" inputmode="decimal" value="0"></div>
+      <div class="campo"><label for="vuelos">Vuelos en avión al año <small>(número)</small></label>
+        <input type="number" id="vuelos" name="vuelos" min="0" step="any" inputmode="decimal" value="0"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Energía</legend>
+      <div class="campo"><label for="aire">Horas al día de aire acondicionado en casa <small>(número)</small></label>
+        <input type="number" id="aire" name="aire" min="0" max="24" step="any" inputmode="decimal" value="0"></div>
+      <div class="campo"><label for="personas">Personas que viven en tu casa <small>(número)</small></label>
+        <input type="number" id="personas" name="personas" min="1" step="1" inputmode="numeric" value="1"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Consumo</legend>
+      <div class="campo"><label for="ropa">Prendas nuevas que compras al mes <small>(número)</small></label>
+        <input type="number" id="ropa" name="ropa" min="0" step="any" inputmode="decimal" value="0"></div>
+      <div class="campo"><label for="celular">Cada cuántos años cambias de celular <small>(número)</small></label>
+        <input type="number" id="celular" name="celular" min="0" step="any" inputmode="decimal" value="2"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Residuos</legend>
+      <div class="campo"><label for="separa">¿Separas la basura?</label>
+        <select id="separa" name="separa">
+          <option>Sí</option>
+          <option>A veces</option>
+          <option selected>No</option>
+        </select></div>
+    </fieldset>
+
+    <button type="submit" id="btnCalcular">Calcular mi huella</button>
+    <div id="estado" role="status"></div>
+  </form>
+
+  <div class="resultado-box" id="cajaResultado" style="display:none">
+    <strong>Resultado (estimación aproximada, no un cálculo oficial)</strong>
+    <div id="resultado"></div>
+  </div>
+
+  <footer>Práctica 4.5 · Desarrollo Sustentable · TecNM Mazatlán</footer>
+</div>
+
+<script>
+  // PEGA_AQUI_TU_URL_DE_MAKE (webhook del escenario Huella_Ecologica_Equipo):
+  const WEBHOOK_URL = "https://hook.us2.make.com/urv74k1ruisvdv2t8jr1eyj9rpvf1wgb";
+
+  const form = document.getElementById("formHuella");
+  const btn = document.getElementById("btnCalcular");
+  const estado = document.getElementById("estado");
+  const resultado = document.getElementById("resultado");
+  const caja = document.getElementById("cajaResultado");
+  const SELECTS = ["carne", "local", "transporte", "separa"];
+  const NUMEROS = ["km", "vuelos", "aire", "personas", "ropa", "celular"];
+
+  form.addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+    // Mismos nombres de campo que Make recibe: carne, local, transporte, km, vuelos, aire, personas, ropa, celular, separa
+    const params = new URLSearchParams();
+    for (const c of SELECTS) params.append(c, document.getElementById(c).value);
+    for (const c of NUMEROS) {
+      let v = parseFloat(document.getElementById(c).value);
+      if (isNaN(v) || v < 0) v = 0;
+      if (c === "personas" && v < 1) v = 1;
+      params.append(c, String(v));
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Calculando tu huella...";
+    estado.textContent = "Calculando tu huella...";
+    estado.className = "";
+    try {
+      const resp = await fetch(WEBHOOK_URL, { method: "POST", body: params });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      resultado.textContent = await resp.text();
+      caja.style.display = "block";
+      estado.textContent = "";
+      caja.scrollIntoView({ behavior: "smooth" });
+    } catch (e) {
+      estado.textContent = "No se pudo calcular, intenta de nuevo.";
+      estado.className = "error";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Calcular mi huella";
+    }
+  });
+</script>
+</body>
+</html>
